@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 const tempMovieData = [
   {
@@ -47,63 +47,22 @@ const tempWatchedData = [
   },
 ];
 
-const API_KEY = 'dc022b7f';
-
 const average = (arr) => arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 export default function App() {
-  const [query, setQuery] = useState('');
-  const [movies, setMovies] = useState([]);
+  const [movies, setMovies] = useState(tempMovieData);
   const [watched, setWatched] = useState(tempWatchedData);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const tempQuery = 'interstellar';
-
-  useEffect(
-    function () {
-      async function fetchMovies() {
-        try {
-          setError('');
-          setIsLoading(true);
-          const response = await fetch(`http://www.omdbapi.com/?apikey=${API_KEY}&s=${query}`);
-
-          if (!response.ok) throw new Error('Error while fetching movies');
-
-          const data = await response.json();
-
-          if (data.Response === 'False') throw new Error('No movies found');
-
-          setMovies(data.Search);
-        } catch (err) {
-          setError(err.message);
-        } finally {
-          setIsLoading(false);
-        }
-      }
-
-      if (query.length < 3) {
-        setMovies([]);
-        setError('');
-        return;
-      }
-      fetchMovies();
-    },
-    [query]
-  );
 
   return (
     <>
       <NavBar>
-        <Search query={query} setQuery={setQuery} />
+        <Search />
         <NumResults movies={movies} />
       </NavBar>
 
       <Main>
         <Box>
-          {/* {isLoading ? <Loader /> : <MovieList movies={movies} />} */}
-          {isLoading && <Loader />}
-          {!isLoading && !error && <MovieList movies={movies} />}
-          {error && <ErrorMessage error={error} />}
+          <MovieList movies={movies} />
         </Box>
 
         <Box>
@@ -112,18 +71,6 @@ export default function App() {
         </Box>
       </Main>
     </>
-  );
-}
-
-function Loader() {
-  return <p className='loader'>Loading...</p>;
-}
-
-function ErrorMessage({ error }) {
-  return (
-    <p className='error'>
-      <span>🛑</span> {error}
-    </p>
   );
 }
 
@@ -145,7 +92,9 @@ function Logo() {
   );
 }
 
-function Search({ query, setQuery }) {
+function Search() {
+  const [query, setQuery] = useState('');
+
   return (
     <input
       className='search'
