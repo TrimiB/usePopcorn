@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import StarRating from './StarRating';
 
 const tempMovieData = [
   {
@@ -92,7 +93,11 @@ export default function App() {
   );
 
   function handleSelectedMovie(id) {
-    setSelectedId(id);
+    setSelectedId((currSelectedId) => (id === currSelectedId ? null : id));
+  }
+
+  function handleCloseMovie() {
+    setSelectedId(null);
   }
 
   return (
@@ -113,7 +118,7 @@ export default function App() {
 
         <Box>
           {selectedId ? (
-            <SelectedMovie selectedId={selectedId} />
+            <SelectedMovie selectedId={selectedId} onCloseMove={handleCloseMovie} />
           ) : (
             <>
               <WatchedSummary watched={watched} />
@@ -281,6 +286,82 @@ function WatchedMovie({ movie }) {
   );
 }
 
-function SelectedMovie({ selectedId }) {
-  return <div>{selectedId}</div>;
+function SelectedMovie({ selectedId, onCloseMove }) {
+  const [selectedMovie, setSelectedMovie] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const {
+    Title: titel,
+    Year: year,
+    Poster: poster,
+    Runtime: runtime,
+    imdbRating,
+    Plot: plot,
+    Released: released,
+    Actors: actors,
+    Director: director,
+    Genre: genre,
+  } = selectedMovie;
+
+  useEffect(() => {
+    async function fetchSelectedMovie() {
+      try {
+        setError('');
+        setIsLoading(true);
+
+        const response = await fetch(`http://www.omdbapi.com/?apikey=${API_KEY}&i=${selectedId}`);
+
+        if (!response.ok) setError('Failed to fetch movie details');
+
+        const data = await response.json();
+
+        setSelectedMovie(data);
+      } catch (err) {
+        console.log(err);
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchSelectedMovie();
+  }, [selectedId]);
+
+  return (
+    <div className='details'>
+      {isLoading && <Loader />}
+      {error && <ErrorMessage error={error} />}
+      {!isLoading && !error && (
+        <>
+          <header>
+            <button className='btn-back' onClick={onCloseMove}>
+              &larr;
+            </button>
+            <img src={poster} alt={`Poster of ${titel}`} />
+            <div className='details-overview'>
+              <h2>{titel}</h2>
+              <p>
+                {released} &bull; {runtime}
+              </p>
+              <p>{genre}</p>
+              <p>
+                <span>⭐️</span>
+                {imdbRating} IMDB Rating
+              </p>
+            </div>
+          </header>
+          <section>
+            <div className='rating'>
+              <StarRating maxRating={10} textSize={24} starSize={24} />
+            </div>
+            <p>
+              <em>{plot}</em>
+            </p>
+            <p>Starring {actors}</p>
+            <p>Directed by {director}</p>
+          </section>
+        </>
+      )}
+    </div>
+  );
 }

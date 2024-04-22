@@ -25,7 +25,7 @@ StarRating.protoTypes = {
 export default function StarRating({
   maxRating = 5,
   starColor = '#ffd83d',
-  textColor = '#000',
+  textColor = '#ffd83d',
   starSize = 20,
   textSize = 20,
   className = '',
