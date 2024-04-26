@@ -291,6 +291,10 @@ body {
   gap: 2.4rem;
 }
 
+.rating p {
+  text-align: center;
+}
+
 .btn-add {
   background-color: var(--color-primary);
   color: var(--color-text);
