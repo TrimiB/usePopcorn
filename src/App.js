@@ -55,7 +55,7 @@ const average = (arr) => arr.reduce((acc, cur, i, arr) => acc + cur / arr.length
 export default function App() {
   const [query, setQuery] = useState('');
   const [movies, setMovies] = useState([]);
-  const [watched, setWatched] = useState(tempWatchedData);
+  const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [selectedId, setSelectedId] = useState(null);
@@ -100,6 +100,10 @@ export default function App() {
     setSelectedId(null);
   }
 
+  function handleWatchedMovie(movie) {
+    setWatched((currWatched) => [...currWatched, movie]);
+  }
+
   return (
     <>
       <NavBar>
@@ -118,7 +122,12 @@ export default function App() {
 
         <Box>
           {selectedId ? (
-            <SelectedMovie selectedId={selectedId} onCloseMove={handleCloseMovie} />
+            <SelectedMovie
+              selectedId={selectedId}
+              onCloseMove={handleCloseMovie}
+              onAddWatchedMovie={handleWatchedMovie}
+              watched={watched}
+            />
           ) : (
             <>
               <WatchedSummary watched={watched} />
@@ -266,8 +275,8 @@ function WatchedMoviesList({ watched }) {
 function WatchedMovie({ movie }) {
   return (
     <li>
-      <img src={movie.Poster} alt={`${movie.Title} poster`} />
-      <h3>{movie.Title}</h3>
+      <img src={movie.poster} alt={`${movie.title} poster`} />
+      <h3>{movie.title}</h3>
       <div>
         <p>
           <span>⭐️</span>
@@ -286,13 +295,18 @@ function WatchedMovie({ movie }) {
   );
 }
 
-function SelectedMovie({ selectedId, onCloseMove }) {
+function SelectedMovie({ selectedId, onCloseMove, onAddWatchedMovie, watched }) {
   const [selectedMovie, setSelectedMovie] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [userRating, setUserRating] = useState(0);
+
+  const isWatched = watched.map((movie) => movie.imdbID).includes(selectedId);
+
+  const watchedUserRating = watched.find((movie) => movie.imdbID === selectedId)?.userRating;
 
   const {
-    Title: titel,
+    Title: title,
     Year: year,
     Poster: poster,
     Runtime: runtime,
@@ -303,6 +317,21 @@ function SelectedMovie({ selectedId, onCloseMove }) {
     Director: director,
     Genre: genre,
   } = selectedMovie;
+
+  function handleAddWatchedMovie() {
+    const newWatchedMovie = {
+      imdbID: selectedId,
+      title,
+      year,
+      poster,
+      runtime: Number(runtime.replace(' min', '')),
+      imdbRating: Number(imdbRating),
+      userRating,
+    };
+
+    onAddWatchedMovie(newWatchedMovie);
+    onCloseMove();
+  }
 
   useEffect(() => {
     async function fetchSelectedMovie() {
@@ -337,9 +366,9 @@ function SelectedMovie({ selectedId, onCloseMove }) {
             <button className='btn-back' onClick={onCloseMove}>
               &larr;
             </button>
-            <img src={poster} alt={`Poster of ${titel}`} />
+            <img src={poster} alt={`Poster of ${title}`} />
             <div className='details-overview'>
-              <h2>{titel}</h2>
+              <h2>{title}</h2>
               <p>
                 {released} &bull; {runtime}
               </p>
@@ -352,7 +381,25 @@ function SelectedMovie({ selectedId, onCloseMove }) {
           </header>
           <section>
             <div className='rating'>
-              <StarRating maxRating={10} textSize={24} starSize={24} />
+              {!isWatched ? (
+                <>
+                  <StarRating
+                    maxRating={10}
+                    textSize={24}
+                    starSize={24}
+                    onSetRating={setUserRating}
+                  />
+                  {userRating > 0 && (
+                    <button className='btn-add' onClick={handleAddWatchedMovie}>
+                      + add to list
+                    </button>
+                  )}
+                </>
+              ) : (
+                <p>
+                  You already rated this movie {watchedUserRating} <span>⭐️</span>
+                </p>
+              )}
             </div>
             <p>
               <em>{plot}</em>
