@@ -363,7 +363,7 @@ function SelectedMovie({ selectedId, onCloseMove, onAddWatchedMovie, watched }) 
     return function () {
       document.removeEventListener('keydown', callback);
     };
-  }, []);
+  }, [onCloseMove]);
 
   useEffect(() => {
     async function fetchSelectedMovie() {
