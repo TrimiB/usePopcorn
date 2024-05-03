@@ -302,6 +302,12 @@ function SelectedMovie({ selectedId, onCloseMove, onAddWatchedMovie, watched }) 
   const [error, setError] = useState('');
   const [userRating, setUserRating] = useState(0);
 
+  const countRating = useRef(0);
+
+  useEffect(() => {
+    if (userRating) countRating.current += 1;
+  }, [userRating]);
+
   const isWatched = watched.map((movie) => movie.imdbID).includes(selectedId);
 
   const watchedUserRating = watched.find((movie) => movie.imdbID === selectedId)?.userRating;
@@ -317,6 +323,7 @@ function SelectedMovie({ selectedId, onCloseMove, onAddWatchedMovie, watched }) 
     Actors: actors,
     Director: director,
     Genre: genre,
+    ratingDecisionsCount = countRating.current,
   } = selectedMovie;
 
   function handleAddWatchedMovie() {
