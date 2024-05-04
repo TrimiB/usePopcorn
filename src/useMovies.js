@@ -2,6 +2,12 @@ import { useEffect, useState } from 'react';
 
 const API_KEY = 'dc022b7f';
 
+/**
+ * A custom React hook that fetches movie data from the OMDb API based on a search query.
+ *
+ * @param {string} query - The search query to use when fetching movie data.
+ * @returns {object} An object containing the fetched movies, a loading state, and an error message (if any).
+ */
 export function useMovies(query) {
   const [movies, setMovies] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
