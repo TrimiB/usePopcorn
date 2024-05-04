@@ -269,7 +269,6 @@ function SelectedMovie({ selectedId, onCloseMove, onAddWatchedMovie, watched }) 
     Actors: actors,
     Director: director,
     Genre: genre,
-    ratingDecisionsCount = countRating.current,
   } = selectedMovie;
 
   function handleAddWatchedMovie() {
@@ -281,6 +280,7 @@ function SelectedMovie({ selectedId, onCloseMove, onAddWatchedMovie, watched }) 
       runtime: Number(runtime.replace(' min', '')),
       imdbRating: Number(imdbRating),
       userRating,
+      contRatingDecisions: countRating.current,
     };
 
     onAddWatchedMovie(newWatchedMovie);
