@@ -22,6 +22,20 @@ StarRating.protoTypes = {
   onSetRating: PropTypes.func,
 };
 
+/**
+ * A React component that renders a star rating UI with customizable options.
+ *
+ * @param {object} props - The component props.
+ * @param {number} [props.maxRating=5] - The maximum number of stars to display.
+ * @param {string} [props.starColor='#ffd83d'] - The color of the filled stars.
+ * @param {string} [props.textColor='#ffd83d'] - The color of the rating text.
+ * @param {number} [props.starSize=20] - The size of the stars in pixels.
+ * @param {number} [props.textSize=20] - The size of the rating text in pixels.
+ * @param {string} [props.className=''] - An optional CSS class name to apply to the component.
+ * @param {string[]} [props.messages=[]] - An array of messages to display for each rating level.
+ * @param {function} [props.onSetRating=() => {}] - A callback function to be called when the rating is set.
+ * @returns {JSX.Element} - The rendered star rating component.
+ */
 export default function StarRating({
   maxRating = 5,
   starColor = '#ffd83d',
